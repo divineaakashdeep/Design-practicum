@@ -1,0 +1,313 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.IO.Ports;
+
+namespace WindowsFormsApplication1
+{
+    public partial class Form1 : Form
+    {
+        private SerialPort myport;
+        
+        int[] angle = new int[6];
+        int[] pre = new int[6];
+        public Form1()
+        {
+            InitializeComponent();
+            init();
+            pictureBox1.Visible = false;
+            pictureBox2.Visible = false;
+            pictureBox3.Visible = false;
+            pictureBox4.Visible = false;
+            
+        }
+
+        private void init()
+        {
+            try
+            {
+                myport = new SerialPort();
+                myport.BaudRate = 9600;            //check here
+                myport.PortName = "COM3";
+                myport.Open();
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("error");
+            }
+
+            button1.Enabled = true;
+            button2.Enabled = true;
+
+            angle[0] = 0;
+            angle[1] = 150;
+            angle[2] = 90;
+            angle[3] = 100;
+            angle[4] = 0;
+            angle[5] = 10;
+
+            
+        }
+
+        private void INV_CLICK(object sender, EventArgs e)
+        {
+            if (angle[5] <= 47)
+            {
+                angle[5] += 8;
+                send_func(angle);
+            }
+            else
+                MessageBox.Show("Cannot go further");
+
+        }
+
+        private void OUT_CLK(object sender, EventArgs e)
+        {
+            if (angle[5] >= 8)
+            {
+                angle[5] -= 8;
+                send_func(angle);
+            }
+            else
+                MessageBox.Show("Cannot go further");
+
+        }
+
+        private void CCW_CLK(object sender, EventArgs e)
+        {
+            if (angle[4] <= 160)
+            {
+                angle[4] += 20;
+                send_func(angle);
+            }
+            else
+                MessageBox.Show("Cannot go further");
+        }
+
+        private void FWD_CLK(object sender, EventArgs e)
+        {
+            if (angle[4] >= 10)
+            {
+                angle[4] -= 10;
+                send_func(angle);
+            }
+            else
+                MessageBox.Show("Cannot go further");
+        }
+
+        private void BWD_CLK(object sender, EventArgs e)
+        {
+            myport.WriteLine("BWD");
+        }
+
+       
+        private void M1LEFT_CLK(object sender, EventArgs e)
+        {
+            if (angle[0] <= 150)
+            {
+                angle[0] += 30;
+                send_func(angle); 
+            }
+            else
+                MessageBox.Show("Cannot go further");
+        }
+
+        private void M1RIGHT_CLK(object sender, EventArgs e)
+        {
+            if (angle[0] >= 30)
+            {
+                angle[0] -= 30;
+                send_func(angle);
+            }
+            else
+                MessageBox.Show("Cannot go further");
+        }
+
+        private void M2LEFT_CLK(object sender, EventArgs e)
+        {
+            if (angle[1] <= 145)
+            {
+                angle[1] += 10;                //here
+                send_func(angle);
+            }
+            else
+                MessageBox.Show("Cannot go further");
+        }
+
+        private void M2RIGHT_CLK(object sender, EventArgs e)
+        {
+            if (angle[1] >= 50)
+            {
+                angle[1] -= 10;                 //here
+                send_func(angle);
+            }
+            else
+                MessageBox.Show("Cannot go further");
+        }
+
+        private void M3LEFT_CLK(object sender, EventArgs e)
+        {
+            if (angle[2] >= 105)
+            {
+                angle[2] -= 15;
+                send_func(angle);
+            }
+            else
+                MessageBox.Show("Cannot go further");
+        }
+
+        private void M3RIGHT_CLK(object sender, EventArgs e)
+        {
+            if (angle[2] <= 165)
+            {
+                angle[2] += 15;
+                send_func(angle);
+            }
+            else
+                MessageBox.Show("Cannot go further");
+        }
+
+        private void Motor1_hover(object sender, EventArgs e)
+        {
+            pictureBox1.Visible = true;
+        }
+
+        private void Motor1_leave(object sender, EventArgs e)
+        {
+            pictureBox1.Visible = false;
+        }
+
+        private void BACK_Click(object sender, EventArgs e)
+        {
+            if (angle[4] >= 10)
+            {
+                angle[4] -= 10;
+                send_func(angle);
+            }
+            else
+                MessageBox.Show("Cannot go further");
+        }
+
+        private void MOTOR4_B_Click(object sender, EventArgs e)
+        {
+            if (angle[3] <= 110)
+            {
+                angle[3] += 10;
+                send_func(angle);
+            }
+            else
+                MessageBox.Show("Cannot go further");
+        }
+
+        private void MOTOR4_UP_click(object sender, EventArgs e)
+        {
+            if (angle[3] >= 10)
+            {
+                angle[3] -= 10;
+                send_func(angle);
+            }
+            else
+                MessageBox.Show("Cannot go further");
+        }
+
+        private void MOTOR2_hover(object sender, EventArgs e)
+        {
+            pictureBox2.Visible = true;
+        }
+
+        private void MOTOR2_leave(object sender, EventArgs e)
+        {
+            pictureBox2.Visible = false;
+        }
+
+        private void MOTOR3_hover(object sender, EventArgs e)
+        {
+            pictureBox3.Visible = true;
+        }
+
+        private void MOTOR3_leave(object sender, EventArgs e)
+        {
+            pictureBox3.Visible = false;
+        }
+
+        private void MOTOR4_hover(object sender, EventArgs e)
+        {
+            pictureBox4.Visible = true;
+        }
+
+        private void MOTOR4_leave(object sender, EventArgs e)
+        {
+            pictureBox4.Visible = false;
+        }
+
+        private void send_func(int [] angle)
+        {
+            String s;
+            s = "u" + angle[0].ToString() + "v" + angle[1].ToString() + "w" + angle[2].ToString() + "x" + angle[3].ToString() + "y" + angle[4].ToString() + "z" + angle[5].ToString() + "\n";
+            myport.Write(s);
+        }
+
+        private void textBox12_TextChanged(object sender, EventArgs e)
+        {
+            //String p;
+            angle[5] = Convert.ToInt32(textBox12.Text);
+            send_func(angle);
+        }
+
+        private void textBox19_TextChanged(object sender, EventArgs e)
+        {
+            angle[4] = Convert.ToInt32(textBox19.Text);
+            send_func(angle);
+        }
+
+        private void textBox17_TextChanged(object sender, EventArgs e)
+        {
+            //angle[4] = Convert.ToInt32(textBox17.Text);
+            //send_func(angle);
+        }
+
+        private void textBox13_TextChanged(object sender, EventArgs e)
+        {
+            angle[0] = Convert.ToInt32(textBox13.Text);
+            send_func(angle);
+        }
+
+        private void textBox24_TextChanged(object sender, EventArgs e)
+        {
+            angle[1] = Convert.ToInt32(textBox24.Text);
+            send_func(angle);
+        }
+
+        private void textBox22_TextChanged(object sender, EventArgs e)
+        {
+            angle[2] = Convert.ToInt32(textBox22.Text);
+            send_func(angle);
+        }
+
+        private void textBox9_TextChanged(object sender, EventArgs e)
+        {
+            angle[3] = Convert.ToInt32(textBox9.Text);
+            send_func(angle);
+        }
+
+        private void button17_Click(object sender, EventArgs e)
+        {
+            angle[0] = 0;
+            angle[1] = 135;
+            angle[2] = 135;
+            angle[3] = 30;
+            angle[4] = 0;
+            angle[5] = 0;
+            send_func(angle);
+           // s = "u" + angle[0].ToString() + "v" + angle[1].ToString() + "w" + angle[2].ToString() + "x" + angle[3].ToString() + "y" + angle[4].ToString() + "z" + angle[5].ToString() + "\n";
+           // myport.Write(s);
+
+        }
+    }
+}
